@@ -17,7 +17,7 @@ try:
             end = time.time()
             elapsed = end - start
             print("RTT: " + str(elapsed) + "seconds\n")
-        except socket.timeout:
+        except TimeoutError:
             print("#" + str(i) + " Requested Time out\n")
 finally:
     print("Closing socket")
