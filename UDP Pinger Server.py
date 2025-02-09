@@ -4,7 +4,7 @@ import random
 serverPort = 12000
 serverSocket = socket(AF_INET, SOCK_DGRAM)
 serverSocket.bind(('', serverPort))
-print('Started UDP server on port: ', {serverPort})
+print(f'Started UDP server on port: {serverPort}')
 while True:
     rand = random.randint(0, 10)
     message, address = serverSocket.recvfrom(1024)
