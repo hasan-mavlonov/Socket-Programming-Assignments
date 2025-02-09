@@ -3,7 +3,7 @@ import os
 
 serverPort = 8080
 serverSocket = socket(AF_INET, SOCK_STREAM)
-serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)  # Allow immediate reuse of the socket
+serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 serverSocket.bind(('', serverPort))
 serverSocket.listen(5)
 
@@ -14,23 +14,23 @@ while True:
     connectionSocket, addr = serverSocket.accept()
 
     try:
-        message = connectionSocket.recv(1024)  # ✅ No UTF-8 decoding
+        message = connectionSocket.recv(1024)
         print("Received request (raw):", repr(message))
 
         if not message.strip():
             connectionSocket.close()
             continue
 
-        request_parts = message.split(b' ')  # ✅ Use bytes instead of string operations
+        request_parts = message.split(b' ')
         if len(request_parts) < 2:
             print("Malformed request, closing connection.")
             connectionSocket.close()
             continue
 
-        filename = request_parts[1].decode().lstrip("/")  # Decode only where needed
+        filename = request_parts[1].decode().lstrip("/")
 
         if os.path.isfile(filename):
-            with open(filename, 'rb') as f:  # ✅ Open file in binary mode
+            with open(filename, 'rb') as f:
                 output = f.read()
 
             response_headers = (
