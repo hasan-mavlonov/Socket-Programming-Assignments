@@ -24,7 +24,7 @@ def recv_msg():
         pass
 
 
-def seng_msg(message, expect_return_msg=True):
+def send_msg(message, expect_return_msg=True):
     ssl_socket.send(f"{message}\r\n".encode())
     if expect_return_msg:
         recv = recv_msg()
@@ -43,3 +43,19 @@ def login(user, password):
 
 def quit():
     return send_msg("QUIT")
+
+
+def send_mail(msg, from_addr, to_addr, ):
+    send_msg(f"MAIL FROM: <{from_addr}>")
+    send_msg(f"TO: <{to_addr}>")
+    send_msg("DATA")
+    send_msg(f"Subject: Hi! Hasan here\r\n", expect_return_msg=False)
+    send_msg(msg, expect_return_msg=False)
+    send_msg(".")
+
+
+ehlo()
+login("h.mavlanov@newuu.uz", "saida0525")
+send_mail("I am Hasan", "h.mavlanov@newuu.uz", "hasanmavlonov79@gmail.com")
+
+quit()
