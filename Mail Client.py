@@ -6,14 +6,14 @@ bufferSize = 2048
 
 
 def create_auth_message(user: str, password: str):
-    str = "\x00" + user + "\x00" + password
-    base64_str = base64.b64encode(str.encode())
-    return "AUTH PLAIN " + base64_str.decode()
+    auth_str = f"\x00{user}\x00{password}"
+    base64_str = base64.b64encode(auth_str.encode()).decode()
+    return f"AUTH PLAIN {base64_str}"
 
 
 sock = socket(AF_INET, SOCK_STREAM)
 sock.settimeout(5)
-ssl_socket = ssl.wrap_socket(sock)
+ssl_socket = ssl.create_default_context().wrap_socket(sock, server_hostname='smtp.gmail.com')
 ssl_socket.connect(('smtp.gmail.com', 465))
 
 
@@ -21,7 +21,7 @@ def recv_msg():
     try:
         return ssl_socket.recv(bufferSize).decode()
     except timeout:
-        pass
+        return None
 
 
 def send_msg(message, expect_return_msg=True):
@@ -33,7 +33,7 @@ def send_msg(message, expect_return_msg=True):
 
 
 def ehlo():
-    return send_msg("ehlo Maheen")
+    return send_msg("EHLO Maheen")
 
 
 def login(user, password):
@@ -45,17 +45,27 @@ def quit():
     return send_msg("QUIT")
 
 
-def send_mail(msg, from_addr, to_addr, ):
+def send_mail(msg, from_addr, to_addr):
     send_msg(f"MAIL FROM: <{from_addr}>")
-    send_msg(f"TO: <{to_addr}>")
+    send_msg(f"RCPT TO: <{to_addr}>")
     send_msg("DATA")
-    send_msg(f"Subject: Hi! Hasan here\r\n", expect_return_msg=False)
-    send_msg(msg, expect_return_msg=False)
-    send_msg(".")
+
+    # Properly formatted email headers
+    email_headers = f"""\
+From: {from_addr}
+To: {to_addr}
+Subject: Hi! Hasan here
+
+{msg}
+""".replace("\n", "\r\n")  # Ensure CRLF line endings
+
+    send_msg(email_headers, expect_return_msg=False)
+
+    # End the DATA section properly
+    send_msg(".", expect_return_msg=True)
 
 
 ehlo()
-login("h.mavlanov@newuu.uz", "saida0525")
-send_mail("I am Hasan", "h.mavlanov@newuu.uz", "hasanmavlonov79@gmail.com")
-
+login("hasanmavlonov79@gmail.com", "habr vyvv hjsx yiom")  # Use an app password
+send_mail("I am Hasan", "hasanmavlonov79@gmail.com", "h.mavlonov@newuu.uz")
 quit()
